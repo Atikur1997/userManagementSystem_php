@@ -16,5 +16,8 @@ public function __construct()
     $this->pdo = new PDO($dsn, $_ENV['DB_USER'], $_ENV['DB_PASSWORD']);
    
 }
+public function getConnection(): PDO{
+    return $this->pdo;
+}
 
 }
