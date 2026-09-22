@@ -1,0 +1,15 @@
+{
+    "name": "nishanrahman/user-management",
+    "autoload": {
+        "psr-4": {
+            "Nishanrahman\\UserManagement\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Atikur Rahman",
+            "email": "nishanrhman@gmail.com"
+        }
+    ],
+    "require": {}
+}
