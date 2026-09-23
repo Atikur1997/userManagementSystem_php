@@ -3,6 +3,7 @@
 use Dotenv\Dotenv;
 use Nishanrahman\UserManagement\Database\Database;
 use Nishanrahman\UserManagement\Repositories\UserRepository;
+use Nishanrahman\UserManagement\Services\UserService;
 
 require_once __DIR__ . "/../vendor/autoload.php";
 
@@ -16,8 +17,9 @@ $pdo = $database->getConnection();
 echo "PDO connection received successfully!";
 
 $userRepository = new UserRepository($pdo);
-$users = $userRepository->getAllUsers();
+$userService = new UserService($userRepository);
 
-echo "<pre>";
-print_r($users);
-echo "</pre>";
+
+
+
+
