@@ -1,5 +1,5 @@
 <?php
-
+session_start();
 use Dotenv\Dotenv;
 use Nishanrahman\UserManagement\Database\Database;
 use Nishanrahman\UserManagement\Repositories\UserRepository;
@@ -16,20 +16,31 @@ $pdo = $database->getConnection();
 $userRepository = new UserRepository($pdo);
 $userService = new UserService($userRepository);
 
-if($_SERVER['REQUEST_METHOD'] === "POST"){
-$name =trim($_POST["name"]);
-$email =trim($_POST["email"]);
-$age = (int) $_POST["age"];
+if ($_SERVER['REQUEST_METHOD'] === "POST") {
+    $name = trim($_POST["name"]);
+    $email = trim($_POST["email"]);
+    $age = (int) $_POST["age"];
 
-$newUserId = $userService->createUser($name, $email, $age);
+    $_SESSION["old_input"]=[
+        'name' => $name,
+        'email' => $email,
+        'age' => $age
+    ];
 
-if (is_numeric($newUserId)) {
-    $message = "User created successfully. User ID: " . $newUserId;
-    $messageType = "success";
-} else {
-    $message = $newUserId;
-    $messageType = "danger";
-}
+    $newUserId = $userService->createUser($name, $email, $age);
+
+    if (is_numeric($newUserId)) {
+
+        $_SESSION['message'] = "User created successfully. User ID: " . $newUserId;
+        $_SESSION['messageType'] = "success";
+
+    } else {
+
+        $_SESSION['message'] = $newUserId;
+        $_SESSION['messageType'] = "danger";
+    }
+    header("Location: index.php");
+    exit;
 }
 
 require_once __DIR__ . "/includes/header.php";
@@ -54,11 +65,16 @@ require_once __DIR__ . "/includes/header.php";
     </h2>
 
 
-    <form method="POST" >
-    <?php if(isset($message)): ?>
-        <div class="alert alert-<?= $messageType ?>"  role="alert">
-            <?= $message ?>
-        </div>
+    <form method="POST">
+        <?php if (isset($_SESSION['message'])): ?>
+            <div class="alert alert-<?= $_SESSION['messageType'] ?>" role="alert">
+                <?= htmlspecialchars($_SESSION['message'])
+                    ?>
+            </div>
+            <?php
+            unset($_SESSION['message']);
+            unset($_SESSION['messageType']);
+            ?>
         <?php endif; ?>
         <div class="mb-3">
             <label for="name" class="form-label">
@@ -66,12 +82,12 @@ require_once __DIR__ . "/includes/header.php";
             </label>
 
             <input
-                type="text"
-                id="name"
-                name="name"
-                class="form-control"
-                placeholder="Enter your name"
-            >
+             type="text" 
+             id="name" 
+             name="name" 
+             class="form-control" 
+             placeholder="Enter your name"
+             value="<?=  htmlspecialchars($_SESSION['old_input']['name'] ?? "") ?>">
         </div>
 
         <div class="mb-3">
@@ -79,12 +95,13 @@ require_once __DIR__ . "/includes/header.php";
                 Email
             </label>
 
-            <input
-                type="email"
-                id="email"
-                name="email"
-                class="form-control"
-                placeholder="Enter your email"
+            <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            class="form-control" 
+            placeholder="Enter your email"
+            value="<?= htmlspecialchars($_SESSION['old_input']['email'] ?? "") ?>"
             >
         </div>
 
@@ -93,19 +110,20 @@ require_once __DIR__ . "/includes/header.php";
                 Age
             </label>
 
-            <input
-                type="number"
-                id="age"
-                name="age"
-                class="form-control"
-                placeholder="Enter your age"
+            <input 
+            type="number" 
+            id="age" 
+            name="age" 
+            class="form-control" 
+            placeholder="Enter your age"
+            value="<?= htmlspecialchars($_SESSION['old_input']['age'] ?? "") ?>"
             >
         </div>
 
         <button type="submit" class="btn btn-primary">
             Create User
         </button>
-
+            <?php unset($_SESSION['old_input']); ?>
     </form>
 
 </div>
