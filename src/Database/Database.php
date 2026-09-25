@@ -2,6 +2,8 @@
 
 namespace Nishanrahman\UserManagement\Database;
 use PDO;
+use RuntimeException;
+use PDOException;
 
 class Database{
 private PDO $pdo;
@@ -13,7 +15,21 @@ public function __construct()
         . ";port=" . $_ENV['DB_PORT']
         . ";charset=utf8mb4";
 
-    $this->pdo = new PDO($dsn, $_ENV['DB_USER'], $_ENV['DB_PASSWORD']);
+    try{
+        $this->pdo = new PDO(
+            $dsn,
+            $_ENV['DB_USER'],
+            $_ENV['DB_PASSWORD']
+        ) ;
+    }
+    catch(PDOException $e){
+        error_log($e->getMessage());
+    throw new RuntimeException(
+        "Database Connection Failed",
+        0,
+        $e
+    );
+    }
    
 }
 public function getConnection(): PDO{

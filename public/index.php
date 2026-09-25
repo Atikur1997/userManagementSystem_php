@@ -1,5 +1,11 @@
 <?php
+$secure = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
 
+session_set_cookie_params([
+    'httpOnly' => true,
+    'secure' => $secure,
+    'samesite' => 'Lax'
+]);
 
 session_start();
 use Dotenv\Dotenv;
@@ -13,8 +19,16 @@ require_once __DIR__ . "/../vendor/autoload.php";
 $dotenv = Dotenv::createImmutable(__DIR__ . "/..");
 $dotenv->load();
 
+try{
 $database = new Database();
 $pdo = $database->getConnection();
+}
+catch(\RuntimeException $e){
+    error_log(
+    "Database Error: " . $e->getMessage()
+);
+    die("Something went wrong. Please try again later.");
+}
 
 $userRepository = new UserRepository($pdo);
 $userService = new UserService($userRepository);
